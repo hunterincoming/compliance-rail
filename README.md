@@ -1,6 +1,6 @@
 ## Compliance Rail
 
-Private day-one provenance layer for cannabis genetics on Midnight
+Private day-one provenance layer for cannabis genetics on Midnight.
 ## The Problem
 Cannabis breeders and genetics platforms currently have no reliable way to prove they created a new strain on day one. Genetics get renamed, leaked, and stolen. DNA testing and forensic dossiers help after disputes happen — but nothing exists for the exact moment a new cross is created.
 
