@@ -1,0 +1,2240 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Veilcore • Investor Master • Midnight Demo</title>
+    <meta
+      name="description"
+      content="Veilcore is zero-knowledge genetic sovereignty for cannabis breeders — prove authenticity, compliance, and lineage without ever exposing proprietary genetics, anchored to the Midnight Network."
+    />
+    <meta
+      property="og:title"
+      content="Veilcore — Zero-Knowledge Genetic Sovereignty"
+    />
+    <meta
+      property="og:description"
+      content="Raw DNA never leaves the breeder's device. Only cryptographic commitments and ZK-proofs are anchored on-chain."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="/favicon.ico" />
+    <script type="module" src="src/main.js"></script>
+    <script>
+      // Safety net: if anything ever throws, log the real message/line instead of
+      // the browser's generic "Script error." so a future issue is diagnosable.
+      window.addEventListener('error', function (e) {
+        console.error('[Veilcore] Runtime error:', e.message, 'at', (e.filename || 'inline') + ':' + e.lineno + ':' + e.colno, e.error && e.error.stack ? e.error.stack : '');
+      });
+    </script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+
+      :root {
+        --accent: #ffffff;
+        --accent-rgb: 255, 255, 255;
+        --bg: #000000;
+      }
+
+      body {
+        font-family: 'Inter', sans-serif;
+        background: var(--bg);
+        color: #ffffff;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .title-font { font-family: 'Space Grotesk', sans-serif; }
+
+      .glass {
+        background: rgba(10, 10, 10, 0.8);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .glass-card {
+        background: #0a0a0a;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.8);
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .glass-card:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+
+      .accent-text { color: var(--accent); }
+      .accent-bg { background: var(--accent); }
+      .accent-border { border-color: var(--accent); }
+      .accent-glow { box-shadow: 0 0 40px rgba(var(--accent-rgb), 0.15); }
+
+      .role-btn {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .role-btn.active {
+        background: #ffffff;
+        color: #000000;
+        border-color: #ffffff;
+      }
+
+      .nav-tab {
+        position: relative;
+        padding-bottom: 4px;
+        color: #666;
+        transition: all 0.3s ease;
+      }
+      .nav-tab.active {
+        color: #fff;
+      }
+      .nav-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: #fff;
+      }
+
+      .pipeline-node {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #222;
+        transition: all 0.6s ease;
+      }
+      .pipeline-node.active {
+        background: var(--accent);
+        box-shadow: 0 0 15px var(--accent);
+      }
+
+      .pipeline-line {
+        height: 1px;
+        background: #222;
+        flex-grow: 1;
+        transition: all 0.6s ease;
+      }
+      .pipeline-line.active { background: var(--accent); }
+
+      @keyframes scan {
+        0% { transform: translateY(-100%); opacity: 0; }
+        50% { opacity: 1; }
+        100% { transform: translateY(200%); opacity: 0; }
+      }
+      .scanner {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 50%;
+        background: linear-gradient(to bottom, transparent, rgba(var(--accent-rgb), 0.2), transparent);
+        animation: scan 2s infinite linear;
+        display: none;
+      }
+
+      /* Role-specific variables */
+      .theme-lab { --accent: #00e5ff; --accent-rgb: 0, 229, 255; }
+      .theme-breeder { --accent: #ffb300; --accent-rgb: 255, 179, 0; }
+      .theme-verifier { --accent: #7c4dff; --accent-rgb: 124, 77, 255; }
+
+      .fade-up { animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* Presentation Mode Optimization */
+      @media (min-width: 1024px) {
+        .presentation-container { max-width: 1100px; }
+      }
+    </style>
+  </head>
+  <body class="theme-lab">
+    <div class="min-h-screen flex flex-col">
+      <!-- Master Header -->
+      <nav class="glass sticky top-0 z-50 px-10 py-5">
+        <div
+          class="presentation-container mx-auto flex items-center justify-between"
+        >
+          <div class="flex items-center gap-6">
+            <div
+              class="title-font text-4xl font-bold tracking-tighter text-white"
+            >
+              veilcore
+            </div>
+            <div class="h-6 w-[1px] bg-white/10"></div>
+            <div
+              class="flex gap-2 bg-white/5 p-1 rounded-full border border-white/10"
+            >
+              <button
+                onclick="setRole(0)"
+                id="rb0"
+                class="role-btn active px-6 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest"
+              >
+                Lab
+              </button>
+              <button
+                onclick="setRole(1)"
+                id="rb1"
+                class="role-btn px-6 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-white/40 hover:text-white"
+              >
+                Breeder
+              </button>
+              <button
+                onclick="setRole(2)"
+                id="rb2"
+                class="role-btn px-6 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-white/40 hover:text-white"
+              >
+                Verifier
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-10">
+            <div
+              class="flex gap-8 text-[11px] font-bold uppercase tracking-[0.15em]"
+            >
+              <button
+                onclick="switchTab(1)"
+                id="t1"
+                data-tab="1"
+                class="nav-tab active"
+              >
+                Intake
+              </button>
+              <button
+                onclick="switchTab(0)"
+                id="t0"
+                data-tab="0"
+                class="nav-tab"
+              >
+                Dashboard
+              </button>
+              <button
+                onclick="switchTab(2)"
+                id="t2"
+                data-tab="2"
+                class="nav-tab"
+              >
+                Certificates
+              </button>
+              <button
+                onclick="switchTab(3)"
+                id="t3"
+                data-tab="3"
+                class="nav-tab"
+              >
+                Verifier
+              </button>
+              <button
+                onclick="switchTab(4)"
+                id="t4"
+                data-tab="4"
+                class="nav-tab"
+              >
+                Compare
+              </button>
+            </div>
+            <button
+              onclick="resetDemo()"
+              title="Clear session and start fresh"
+              class="bg-white/5 border border-white/10 text-white/60 px-5 py-3 rounded-full font-bold text-[11px] uppercase tracking-widest hover:bg-white/10 hover:text-white transition-all active:scale-95"
+            >
+              <i class="fa-solid fa-rotate-left mr-2"></i>Reset
+            </button>
+            <button
+              onclick="runFullDemo()"
+              class="bg-white text-black px-6 py-3 rounded-full font-bold text-[11px] uppercase tracking-widest hover:bg-white/90 transition-all active:scale-95 accent-glow"
+            >
+              <i class="fa-solid fa-play mr-2"></i>Full Demo
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Privacy Sentinel -->
+      <div class="border-b border-white/5 bg-white/[0.02]">
+        <div
+          class="presentation-container mx-auto px-10 py-2.5 flex justify-center items-center gap-4 text-[9px] font-bold tracking-[0.3em] uppercase text-white/40"
+        >
+          <span class="w-1.5 h-1.5 rounded-full accent-bg accent-glow"></span>
+          <span id="privacyLine"
+            >Veilcore Protocol: Zero-Knowledge Data Sovereignty</span
+          >
+          <span class="w-1.5 h-1.5 rounded-full accent-bg accent-glow"></span>
+          0 Bytes Shared • Local Browser Hashing
+        </div>
+      </div>
+
+      <div
+        class="presentation-container mx-auto w-full px-10 py-12 flex flex-col gap-10 flex-1"
+      >
+        <!-- Main Content Panel -->
+        <div class="flex-1 flex flex-col">
+          <!-- Panel 1: Intake (The Core Demo) -->
+          <div id="panel1" class="flex-1 flex flex-col fade-up">
+            <div
+              class="glass-card rounded-[40px] p-16 flex-1 flex flex-col relative overflow-hidden"
+            >
+              <div
+                class="absolute top-0 right-0 w-[500px] h-[500px] bg-white/[0.02] rounded-full -mr-64 -mt-64 blur-[100px]"
+              ></div>
+
+              <div class="mb-10 relative z-10">
+                <h1
+                  class="title-font text-5xl font-bold mb-4"
+                  id="intakeHeadline"
+                >
+                  Genetic Data Intake
+                </h1>
+                <p
+                  class="text-white/40 text-lg max-w-2xl leading-relaxed"
+                  id="intakeSubtitle"
+                >
+                  Chain-of-custody starts at the physical sample — before
+                  sequencing ever begins.
+                  <span class="accent-text font-semibold"
+                    >Privacy is mathematically guaranteed.</span
+                  >
+                </p>
+              </div>
+
+              <!-- Step 1: Physical Sample Log -->
+              <div
+                id="step1Card"
+                class="relative z-10 border border-white/10 bg-white/[0.02] rounded-[32px] p-10"
+              >
+                <div class="flex items-center justify-between gap-8 flex-wrap">
+                  <div class="flex items-center gap-6">
+                    <div
+                      class="w-14 h-14 shrink-0 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center font-bold text-lg"
+                    >
+                      1
+                    </div>
+                    <div>
+                      <div class="text-lg font-bold mb-1">
+                        Sign Intake Contract
+                      </div>
+                      <div
+                        class="text-white/30 text-sm max-w-md"
+                        id="step1Status"
+                      >
+                        Record who's dropping off the sample, then review and
+                        sign the custody agreement before it's timestamped.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <button
+                      onclick="viewSignedContract()"
+                      id="viewContractBtn"
+                      class="hidden bg-white/5 border border-white/10 text-white/70 px-6 py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition-all whitespace-nowrap"
+                    >
+                      <i class="fa-solid fa-file-lines mr-2"></i>View Contract
+                    </button>
+                    <button
+                      onclick="openContractModal()"
+                      id="step1Btn"
+                      class="bg-white text-black px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-white/80 transition-all active:scale-95 whitespace-nowrap"
+                    >
+                      Sign Intake Contract
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Intake fields, shown before signing -->
+                <div
+                  id="strainInputWrap"
+                  class="mt-8 pt-8 border-t border-white/5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                >
+                  <div>
+                    <label
+                      class="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-3 block"
+                      >Submitted By</label
+                    >
+                    <input
+                      type="text"
+                      id="submitterName"
+                      placeholder="Full name"
+                      class="w-full py-4 px-6 bg-black/60 border border-white/10 rounded-2xl text-white outline-none focus:border-white/30 transition-all text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      class="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-3 block"
+                      >Role</label
+                    >
+                    <select
+                      id="submitterRole"
+                      class="w-full py-4 px-6 bg-black/60 border border-white/10 rounded-2xl text-white outline-none focus:border-white/30 transition-all text-sm"
+                    >
+                      <option>Breeder / Owner</option>
+                      <option>Lab Technician</option>
+                      <option>Courier / Custody Agent</option>
+                      <option>Third-Party Auditor</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label
+                      class="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-3 block"
+                      >Strain / Sample Name</label
+                    >
+                    <input
+                      type="text"
+                      id="strainName"
+                      placeholder="e.g. Blue Lotus No. 4"
+                      class="w-full py-4 px-6 bg-black/60 border border-white/10 rounded-2xl text-white outline-none focus:border-white/30 transition-all text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      class="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-3 block"
+                      >Email for Certificate</label
+                    >
+                    <input
+                      type="email"
+                      id="submitterEmail"
+                      placeholder="you@domain.com"
+                      class="w-full py-4 px-6 bg-black/60 border border-white/10 rounded-2xl text-white outline-none focus:border-white/30 transition-all text-sm"
+                    />
+                  </div>
+                </div>
+
+                <!-- Contract detail panel, revealed after signing -->
+                <div
+                  id="contractView"
+                  class="hidden mt-8 pt-8 border-t border-white/5 grid grid-cols-2 md:grid-cols-3 gap-6"
+                >
+                  <div>
+                    <div
+                      class="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1"
+                    >
+                      Contract ID
+                    </div>
+                    <div
+                      class="font-mono text-sm accent-text"
+                      id="mdContractId"
+                    >
+                      —
+                    </div>
+                  </div>
+                  <div>
+                    <div
+                      class="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1"
+                    >
+                      Sample ID
+                    </div>
+                    <div class="font-mono text-sm accent-text" id="mdSampleId">
+                      —
+                    </div>
+                  </div>
+                  <div>
+                    <div
+                      class="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1"
+                    >
+                      Strain
+                    </div>
+                    <div class="font-mono text-sm" id="mdStrain">—</div>
+                  </div>
+                  <div>
+                    <div
+                      class="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1"
+                    >
+                      Submitted By
+                    </div>
+                    <div class="font-mono text-sm" id="mdSubmitter">—</div>
+                  </div>
+                  <div>
+                    <div
+                      class="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1"
+                    >
+                      Role
+                    </div>
+                    <div class="font-mono text-sm" id="mdRole">—</div>
+                  </div>
+                  <div>
+                    <div
+                      class="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1"
+                    >
+                      Timestamp
+                    </div>
+                    <div class="font-mono text-sm" id="mdTimestamp">—</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 2: Pair Sequence File (locked until Step 1) -->
+              <div
+                id="step2Card"
+                class="relative z-10 mt-6 border border-white/5 bg-white/[0.01] rounded-[32px] p-10 opacity-30 pointer-events-none transition-opacity duration-700"
+              >
+                <div
+                  class="flex items-center justify-between gap-6 mb-10 flex-wrap"
+                >
+                  <div class="flex items-center gap-6">
+                    <div
+                      class="w-14 h-14 shrink-0 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center font-bold text-lg"
+                    >
+                      2
+                    </div>
+                    <div>
+                      <div class="text-lg font-bold mb-1">
+                        Pair Sequence File
+                      </div>
+                      <div class="text-white/30 text-sm">
+                        Binds the digital sequence to sample
+                        <span id="pairedSampleId" class="accent-text font-mono"
+                          >—</span
+                        >, locked at
+                        <span id="pairedTimestamp" class="accent-text font-mono"
+                          >—</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onclick="togglePreviousTimestamps()"
+                    id="loadPrevBtn"
+                    class="bg-white/5 border border-white/10 text-white/70 px-6 py-3 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition-all whitespace-nowrap"
+                  >
+                    <i class="fa-solid fa-clock-rotate-left mr-2"></i>Load
+                    Previous Timestamp
+                  </button>
+                </div>
+
+                <!-- Previous timestamps list, for the sequencing-delay scenario -->
+                <div
+                  id="previousTimestamps"
+                  class="hidden mb-8 border border-white/10 bg-black/40 rounded-[24px] divide-y divide-white/5 overflow-hidden"
+                >
+                  <!-- populated by JS -->
+                </div>
+
+                <!-- Interaction Zone -->
+                <div
+                  id="dropzone"
+                  onclick="simulateFileIntake()"
+                  class="group border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] rounded-[32px] py-24 flex flex-col items-center justify-center transition-all cursor-pointer relative overflow-hidden"
+                >
+                  <div id="scanner" class="scanner"></div>
+                  <div
+                    class="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white mb-8 group-hover:scale-110 transition-all"
+                  >
+                    <i class="fa-solid fa-dna text-3xl"></i>
+                  </div>
+                  <div
+                    class="inline-flex items-center gap-1.5 px-3 py-1 mb-4 rounded-full border border-white/15 bg-white/5 text-white/50 text-[9px] font-bold uppercase tracking-widest"
+                  >
+                    <i class="fa-solid fa-flask"></i>Phase 2 &middot; Simulated
+                    Sequencer Data
+                  </div>
+                  <div class="text-xl font-bold mb-1">
+                    Simulate Genetic Sequence
+                  </div>
+                  <div class="text-white/30 text-sm font-medium">
+                    Click to generate a sample .fasta read for this demo
+                  </div>
+                  <button
+                    onclick="event.stopPropagation(); document.getElementById('fileInput').click()"
+                    class="relative z-10 mt-6 text-[10px] font-bold text-white/25 hover:text-white uppercase tracking-widest transition-colors"
+                  >
+                    <i class="fa-solid fa-paperclip mr-1.5"></i>Or upload a real
+                    file
+                  </button>
+                  <input
+                    type="file"
+                    id="fileInput"
+                    class="hidden"
+                    onchange="handleFile(this)"
+                  />
+                </div>
+
+                <!-- Processing Engine -->
+                <div
+                  id="activeIntake"
+                  class="hidden mt-10 space-y-12 relative z-10"
+                >
+                  <div
+                    class="flex items-center justify-between p-10 bg-white/[0.03] rounded-[32px] border border-white/10 relative overflow-hidden"
+                  >
+                    <div id="activeScanner" class="scanner"></div>
+                    <div class="flex items-center gap-8">
+                      <div
+                        class="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center text-white border border-white/10"
+                      >
+                        <i
+                          class="fa-solid fa-file-dna text-2xl accent-text"
+                        ></i>
+                      </div>
+                      <div>
+                        <div
+                          class="font-bold text-2xl tracking-tight mb-1"
+                          id="fileName"
+                        >
+                          Sample_Sequence.fasta
+                        </div>
+                        <div
+                          class="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]"
+                          id="fileSize"
+                        >
+                          Local Buffer Active
+                        </div>
+                      </div>
+                    </div>
+                    <div class="flex flex-col items-end gap-3">
+                      <div
+                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-emerald-400/30 bg-emerald-400/10 text-emerald-300 text-[9px] font-bold uppercase tracking-widest"
+                      >
+                        <i class="fa-solid fa-circle-check"></i>Phase 1 &middot;
+                        Real SHA-256
+                      </div>
+                      <button
+                        onclick="computeRealHash()"
+                        id="hashBtn"
+                        class="bg-white text-black px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-white/80 transition-all active:scale-95"
+                      >
+                        Compute Local Hash
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Pipeline Visualizer -->
+                  <div class="px-10">
+                    <div class="flex items-center">
+                      <div class="flex flex-col items-center flex-1">
+                        <div id="s-1" class="pipeline-node active mb-4"></div>
+                        <div
+                          class="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em]"
+                        >
+                          Intake
+                        </div>
+                      </div>
+                      <div id="l-1" class="pipeline-line"></div>
+                      <div class="flex flex-col items-center flex-1">
+                        <div id="s-2" class="pipeline-node mb-4"></div>
+                        <div
+                          class="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em]"
+                        >
+                          SHA-256
+                        </div>
+                      </div>
+                      <div id="l-2" class="pipeline-line"></div>
+                      <div class="flex flex-col items-center flex-1">
+                        <div id="s-3" class="pipeline-node mb-4"></div>
+                        <div
+                          class="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em]"
+                        >
+                          ZK Commitment
+                        </div>
+                      </div>
+                      <div id="l-3" class="pipeline-line"></div>
+                      <div class="flex flex-col items-center flex-1">
+                        <div id="s-4" class="pipeline-node mb-4"></div>
+                        <div
+                          class="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em]"
+                        >
+                          Midnight
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    id="hashDisplay"
+                    class="hidden p-8 bg-black/80 rounded-[24px] border border-white/10 font-mono text-xs text-white/60 break-all leading-loose"
+                  >
+                    <!-- Result -->
+                  </div>
+
+                  <!-- Key Custody: shows who can ever read this sequence, vs. a centralized fingerprint registry -->
+                  <div
+                    id="custodyCard"
+                    class="hidden p-10 bg-white/[0.02] border border-white/10 rounded-[32px] space-y-6"
+                  >
+                    <div>
+                      <div
+                        class="flex items-center justify-between gap-3 mb-2 flex-wrap"
+                      >
+                        <div class="flex items-center gap-3">
+                          <i class="fa-solid fa-key accent-text"></i>
+                          <div class="font-bold text-lg">Key Custody</div>
+                        </div>
+                        <div
+                          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-white/15 bg-white/5 text-white/50 text-[9px] font-bold uppercase tracking-widest"
+                        >
+                          <i class="fa-solid fa-flask"></i>Phase 2 &middot;
+                          Target Architecture (Simulated)
+                        </div>
+                      </div>
+                      <p class="text-white/30 text-xs leading-relaxed max-w-xl">
+                        Unlike a centralized fingerprint registry, no party
+                        other than the breeder ever holds a readable copy of
+                        this sequence — there's no decoding key sitting in a lab
+                        database to lose, subpoena, or leak.
+                      </p>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-4">
+                      <div
+                        class="p-6 bg-black/40 rounded-2xl border border-white/5"
+                      >
+                        <div class="flex items-center gap-3 mb-3">
+                          <div
+                            class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/60"
+                          >
+                            <i class="fa-solid fa-server text-sm"></i>
+                          </div>
+                          <div
+                            class="text-[10px] font-bold text-white/40 uppercase tracking-widest"
+                          >
+                            Sequencing Lab
+                          </div>
+                        </div>
+                        <div class="font-bold text-sm mb-2 text-white/80">
+                          Encrypted Blob Only
+                        </div>
+                        <p class="text-white/30 text-[11px] leading-relaxed">
+                          Sequencer output is encrypted the instant it's
+                          produced, using a key only the breeder controls. The
+                          lab stores ciphertext plus a hash — enough to prove it
+                          processed the sample, never enough to read it.
+                        </p>
+                      </div>
+                      <div
+                        class="p-6 bg-black/40 rounded-2xl border border-white/10"
+                      >
+                        <div class="flex items-center gap-3 mb-3">
+                          <div
+                            class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center accent-text"
+                          >
+                            <i class="fa-solid fa-key text-sm"></i>
+                          </div>
+                          <div
+                            class="text-[10px] font-bold text-white/40 uppercase tracking-widest"
+                          >
+                            Breeder — This Device
+                          </div>
+                        </div>
+                        <div class="font-bold text-sm mb-2 accent-text">
+                          Sole Decryption Key
+                        </div>
+                        <p class="text-white/30 text-[11px] leading-relaxed">
+                          Generated locally before intake and never transmitted.
+                          This is the only key that will ever exist for this
+                          sample — not Veilcore, not the lab, not the ledger
+                          holds a copy.
+                        </p>
+                      </div>
+                    </div>
+
+                    <p
+                      class="text-white/20 text-[10px] leading-relaxed max-w-xl"
+                    >
+                      A sequencer still has to briefly read the physical sample
+                      to produce output — that's chemistry, not cryptography.
+                      What's guaranteed is that the readout is encrypted before
+                      it's written to disk or sent anywhere, not that the
+                      reading step doesn't exist.
+                    </p>
+                  </div>
+
+                  <!-- Selective Disclosure: choose which genetic facts get proven publicly -->
+                  <div
+                    id="disclosureCard"
+                    class="hidden p-10 bg-white/[0.02] border border-white/10 rounded-[32px] space-y-6"
+                  >
+                    <div>
+                      <div
+                        class="flex items-center justify-between gap-3 mb-2 flex-wrap"
+                      >
+                        <div class="flex items-center gap-3">
+                          <i class="fa-solid fa-eye-slash accent-text"></i>
+                          <div class="font-bold text-lg">
+                            Selective Disclosure
+                          </div>
+                        </div>
+                        <div
+                          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-white/15 bg-white/5 text-white/50 text-[9px] font-bold uppercase tracking-widest"
+                        >
+                          <i class="fa-solid fa-flask"></i>Phase 2 &middot; ZK
+                          Proof Simulated
+                        </div>
+                      </div>
+                      <p class="text-white/30 text-xs leading-relaxed max-w-xl">
+                        Choose which facts about this sample become
+                        human-readable. Everything is proven true against the
+                        sequence — toggled-off facts stay
+                        <span class="text-white/50 font-semibold"
+                          >mathematically provable but never shown</span
+                        >.
+                      </p>
+                    </div>
+
+                    <div id="claimsList" class="space-y-3">
+                      <!-- populated by JS -->
+                    </div>
+
+                    <label
+                      id="consentWrap"
+                      class="flex items-start gap-4 p-5 bg-black/40 rounded-2xl border border-white/5 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        id="disclosureConsent"
+                        onchange="onConsentChange()"
+                        class="mt-0.5 w-4 h-4 shrink-0 accent-white"
+                      />
+                      <span class="text-[11px] text-white/50 leading-relaxed"
+                        >I confirm the facts marked
+                        <span class="text-white/70 font-semibold">Public</span>
+                        above are intended for permanent public disclosure.
+                        <span class="text-white/70 font-semibold"
+                          >This choice cannot be changed once anchored to the
+                          ledger.</span
+                        ></span
+                      >
+                    </label>
+
+                    <button
+                      onclick="generateZkProof()"
+                      id="zkProofBtn"
+                      disabled
+                      class="w-full py-6 bg-white/5 border border-white/10 text-white/30 font-bold rounded-2xl text-xs uppercase tracking-widest transition-all active:scale-[0.98] cursor-not-allowed"
+                    >
+                      Generate Zero-Knowledge Proof
+                    </button>
+
+                    <div
+                      id="zkProofOutput"
+                      class="hidden p-8 bg-black/80 rounded-[24px] border border-white/10"
+                    >
+                      <div class="flex items-center justify-between mb-2">
+                        <div
+                          class="font-bold accent-text uppercase tracking-[0.2em] text-[10px]"
+                        >
+                          Zero-Knowledge Proof (π)
+                        </div>
+                        <button
+                          onclick="reviseDisclosure()"
+                          id="reviseBtn"
+                          class="text-[9px] font-bold text-white/30 hover:text-white uppercase tracking-widest transition-colors"
+                        >
+                          <i class="fa-solid fa-rotate-left mr-1.5"></i>Revise
+                          Disclosure
+                        </button>
+                      </div>
+                      <div
+                        class="font-mono text-xs text-white/60 break-all leading-loose"
+                        id="zkProofHash"
+                      >
+                        —
+                      </div>
+                      <div
+                        class="text-white/30 text-[11px] mt-4 leading-relaxed"
+                        id="zkProofStatement"
+                      ></div>
+                    </div>
+                  </div>
+
+                  <button
+                    onclick="completeFlow()"
+                    id="anchorBtn"
+                    class="hidden w-full py-8 bg-white text-black font-bold rounded-[32px] text-xl transition-all active:scale-[0.98] accent-glow tracking-tight"
+                  >
+                    Anchor Commitment to Midnight Ledger
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dashboard Panel -->
+          <div id="panel0" class="hidden flex-1 fade-up">
+            <div class="glass-card rounded-[40px] p-16">
+              <h2 class="title-font text-4xl font-bold mb-12">
+                System Performance
+              </h2>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div
+                  class="p-10 bg-white/[0.02] rounded-[32px] border border-white/5"
+                >
+                  <div
+                    class="text-white/30 text-[10px] font-bold uppercase tracking-widest mb-4"
+                  >
+                    Anchored Commitments
+                  </div>
+                  <div class="text-5xl font-bold accent-text" id="statAnchored">
+                    1,248
+                  </div>
+                </div>
+                <div
+                  class="p-10 bg-white/[0.02] rounded-[32px] border border-white/5"
+                >
+                  <div
+                    class="text-white/30 text-[10px] font-bold uppercase tracking-widest mb-4"
+                  >
+                    Total Integrity
+                  </div>
+                  <div class="text-5xl font-bold">100%</div>
+                </div>
+                <div
+                  class="p-10 bg-white/[0.02] rounded-[32px] border border-white/5"
+                >
+                  <div
+                    class="text-white/30 text-[10px] font-bold uppercase tracking-widest mb-4"
+                  >
+                    Network Latency
+                  </div>
+                  <div class="text-5xl font-bold">1.2s</div>
+                </div>
+                <div
+                  class="p-10 bg-white/[0.02] rounded-[32px] border border-white/5"
+                >
+                  <div
+                    class="text-white/30 text-[10px] font-bold uppercase tracking-widest mb-4"
+                  >
+                    Data Transmitted
+                  </div>
+                  <div class="text-5xl font-bold text-white/10">0.0b</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Certificate Panel -->
+          <div
+            id="panel2"
+            class="hidden flex-1 fade-up flex flex-col items-center justify-center"
+          >
+            <div
+              class="w-full max-w-xl glass-card rounded-[40px] p-16 text-center"
+            >
+              <div
+                class="w-20 h-20 mx-auto mb-10 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center text-white text-3xl"
+              >
+                <i class="fa-solid fa-award"></i>
+              </div>
+              <h2 class="title-font text-3xl font-bold mb-4">
+                Digital Genetic Certificate
+              </h2>
+              <p class="text-white/30 mb-12 text-sm leading-relaxed">
+                Crytographically verified by the Veilcore Protocol. This asset
+                is anchored on the Midnight Network ZK-Ledger.
+              </p>
+
+              <div
+                class="bg-black p-10 rounded-[32px] border border-white/10 text-left"
+              >
+                <div
+                  class="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-2"
+                >
+                  Verified Asset ID
+                </div>
+                <div class="font-bold text-xl mb-8" id="certAssetId">
+                  VEIL-SEQ-PENDING-X
+                </div>
+                <div
+                  class="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-2"
+                >
+                  Intake Contract
+                </div>
+                <div
+                  class="font-mono text-sm text-white/70 mb-8"
+                  id="certContractId"
+                >
+                  —
+                </div>
+                <div
+                  class="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-2"
+                >
+                  Midnight Commitment Hash
+                </div>
+                <div
+                  class="font-mono text-[11px] text-white/60 p-5 bg-white/[0.03] rounded-2xl break-all mb-8"
+                  id="certHash"
+                >
+                  Run an intake to generate a commitment
+                </div>
+
+                <div
+                  class="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-3"
+                >
+                  Publicly Disclosed Facts
+                </div>
+                <div id="certClaims" class="space-y-2 mb-2">
+                  <!-- populated by JS -->
+                </div>
+                <div
+                  class="text-[9px] font-bold text-white/25 uppercase tracking-widest"
+                  id="certSealedNote"
+                ></div>
+
+                <div
+                  class="mt-10 pt-8 border-t border-white/10 flex justify-between items-center text-[10px] font-bold text-white/20 uppercase tracking-[0.2em]"
+                >
+                  <span id="certIssued">Not yet issued</span>
+                  <span class="accent-text">DNA Hash Paired</span>
+                </div>
+              </div>
+
+              <div
+                id="certEmailNote"
+                class="hidden mt-6 flex items-center justify-center gap-3 text-[11px] font-bold text-white/40 uppercase tracking-widest"
+              >
+                <i class="fa-solid fa-paper-plane accent-text"></i>
+                <span
+                  >Certificate sent to
+                  <span
+                    class="accent-text normal-case tracking-normal"
+                    id="certEmailAddr"
+                    >—</span
+                  ></span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Verifier Panel -->
+          <div
+            id="panel3"
+            class="hidden flex-1 fade-up flex flex-col items-center justify-center"
+          >
+            <div
+              class="w-full max-w-2xl glass-card rounded-[40px] p-16 text-center"
+            >
+              <h2 class="title-font text-3xl font-bold mb-4 tracking-tight">
+                Public Commitment Verifier
+              </h2>
+              <p class="text-white/30 mb-10 text-sm">
+                Query the Midnight ledger to validate a provenance record
+                without data leaks.
+              </p>
+
+              <div class="relative w-full mb-6">
+                <input
+                  type="text"
+                  id="verifyInput"
+                  placeholder="Enter Certificate Hash..."
+                  class="w-full py-8 px-10 bg-white/[0.03] border border-white/10 rounded-[32px] text-white outline-none focus:border-white/30 transition-all font-mono text-sm tracking-tight"
+                />
+                <button
+                  onclick="runVerifyAnim()"
+                  class="absolute right-3 top-3 bottom-3 px-10 bg-white text-black font-bold rounded-2xl hover:bg-white/90 transition-all"
+                >
+                  Verify
+                </button>
+              </div>
+
+              <div class="flex items-center justify-center gap-8 mb-10">
+                <button
+                  onclick="autofillVerifier()"
+                  class="text-[10px] font-bold text-white/30 hover:text-white uppercase tracking-widest transition-colors"
+                >
+                  <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Use my
+                  last anchored hash
+                </button>
+                <div class="w-[1px] h-3 bg-white/10"></div>
+                <button
+                  onclick="simulateTamper()"
+                  class="text-[10px] font-bold text-white/30 hover:text-red-300 uppercase tracking-widest transition-colors"
+                >
+                  <i class="fa-solid fa-bolt mr-2"></i>Simulate tampering
+                </button>
+              </div>
+
+              <div
+                id="vSuccess"
+                class="hidden p-8 rounded-[32px] border border-white/10 bg-white/[0.02] text-left"
+              >
+                <div class="flex items-center gap-6">
+                  <div
+                    class="w-12 h-12 shrink-0 rounded-full border-2 border-white/20 flex items-center justify-center text-white accent-glow"
+                  >
+                    <i class="fa-solid fa-check text-xl"></i>
+                  </div>
+                  <div class="text-left">
+                    <div class="font-bold text-lg">Authenticity Validated</div>
+                    <p
+                      class="text-[10px] font-bold text-white/30 uppercase tracking-[0.1em]"
+                      id="vSuccessSub"
+                    >
+                      Found in Midnight Ledger Block #892,102
+                    </p>
+                  </div>
+                </div>
+                <div
+                  id="vClaims"
+                  class="space-y-2 mt-6 pt-6 border-t border-white/10"
+                ></div>
+                <div
+                  class="text-[9px] font-bold text-white/25 uppercase tracking-widest mt-3"
+                  id="vSealedNote"
+                ></div>
+              </div>
+
+              <div
+                id="vFail"
+                class="hidden p-8 rounded-[32px] border border-red-500/20 bg-red-500/[0.04] flex items-center gap-6 text-left"
+              >
+                <div
+                  class="w-12 h-12 shrink-0 rounded-full border-2 border-red-400/30 flex items-center justify-center text-red-300"
+                >
+                  <i class="fa-solid fa-xmark text-xl"></i>
+                </div>
+                <div class="text-left">
+                  <div class="font-bold text-lg">No Matching Commitment</div>
+                  <p
+                    class="text-[10px] font-bold text-white/30 uppercase tracking-[0.1em]"
+                  >
+                    This hash was not found on the Midnight ledger — check for
+                    typos or run an intake first
+                  </p>
+                </div>
+              </div>
+
+              <div
+                id="vTamper"
+                class="hidden p-8 rounded-[32px] border border-red-500/20 bg-red-500/[0.04] text-left"
+              >
+                <div class="flex items-center gap-6 mb-6">
+                  <div
+                    class="w-12 h-12 shrink-0 rounded-full border-2 border-red-400/30 flex items-center justify-center text-red-300"
+                  >
+                    <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                  </div>
+                  <div>
+                    <div class="font-bold text-lg">
+                      Tamper Detected — Proof Rejected
+                    </div>
+                    <p
+                      class="text-[10px] font-bold text-white/30 uppercase tracking-[0.1em]"
+                    >
+                      One flipped character. Zero match.
+                    </p>
+                  </div>
+                </div>
+                <div
+                  class="p-6 bg-black/60 rounded-2xl border border-white/5 font-mono text-[11px] leading-loose break-all mb-4"
+                >
+                  <div
+                    class="text-white/25 text-[9px] uppercase tracking-widest mb-1"
+                  >
+                    Original anchored hash
+                  </div>
+                  <div id="tamperOriginalDisplay" class="text-white/50 mb-4">
+                    —
+                  </div>
+                  <div
+                    class="text-white/25 text-[9px] uppercase tracking-widest mb-1"
+                  >
+                    Submitted (tampered)
+                  </div>
+                  <div id="tamperSubmittedDisplay" class="text-red-300">—</div>
+                </div>
+                <p class="text-white/40 text-xs leading-relaxed">
+                  Hash functions give no partial credit — the avalanche effect
+                  means even a single-bit change produces a completely
+                  different, unrelated output. That's what makes tampering with
+                  an anchored record mathematically detectable, not just
+                  policy-forbidden.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Compare Panel: honest side-by-side vs. a centralized fingerprint registry -->
+          <div id="panel4" class="hidden flex-1 fade-up">
+            <div class="glass-card rounded-[40px] p-16">
+              <div class="max-w-3xl mb-12">
+                <div
+                  class="text-[10px] font-bold accent-text uppercase tracking-widest mb-3"
+                >
+                  Why This Architecture
+                </div>
+                <h2 class="title-font text-4xl font-bold mb-4 tracking-tight">
+                  Centralized Registry vs. Veilcore
+                </h2>
+                <p class="text-white/40 text-base leading-relaxed">
+                  Most cannabis genetic ID systems today work by storing a
+                  readable genetic fingerprint in a central database so samples
+                  can be compared against each other. That comparison is useful
+                  — but it means one party permanently holds everyone's raw
+                  genetic identity in a form they can read.
+                </p>
+              </div>
+
+              <div class="overflow-x-auto">
+                <div
+                  class="min-w-[720px] overflow-hidden rounded-[32px] border border-white/10"
+                >
+                  <div
+                    class="grid grid-cols-3 bg-white/[0.03] text-[10px] font-bold uppercase tracking-widest text-white/40"
+                  >
+                    <div class="p-6 border-r border-white/5"></div>
+                    <div class="p-6 border-r border-white/5">
+                      Centralized Fingerprint Registry<span
+                        class="block text-white/20 normal-case font-medium mt-1 tracking-normal"
+                        >Industry standard today</span
+                      >
+                    </div>
+                    <div class="p-6 accent-text">Veilcore Protocol</div>
+                  </div>
+
+                  <div class="grid grid-cols-3 border-t border-white/5">
+                    <div
+                      class="p-6 border-r border-white/5 text-xs font-bold text-white/60 self-center"
+                    >
+                      Who holds the raw genetic data
+                    </div>
+                    <div
+                      class="p-6 border-r border-white/5 text-xs text-white/40 leading-relaxed"
+                    >
+                      <i class="fa-solid fa-minus text-white/15 mr-2"></i
+                      >Central lab/registry database — stored in the clear so
+                      samples can be compared
+                    </div>
+                    <div class="p-6 text-xs text-white/70 leading-relaxed">
+                      <i class="fa-solid fa-check accent-text mr-2"></i>Only the
+                      breeder — a keypair generated on their own device before
+                      intake
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-3 border-t border-white/5">
+                    <div
+                      class="p-6 border-r border-white/5 text-xs font-bold text-white/60 self-center"
+                    >
+                      What a data breach exposes
+                    </div>
+                    <div
+                      class="p-6 border-r border-white/5 text-xs text-white/40 leading-relaxed"
+                    >
+                      <i class="fa-solid fa-minus text-white/15 mr-2"></i>Every
+                      submitter's full genetic fingerprint, in readable form
+                    </div>
+                    <div class="p-6 text-xs text-white/70 leading-relaxed">
+                      <i class="fa-solid fa-check accent-text mr-2"></i
+                      >Encrypted ciphertext only — mathematically useless
+                      without the breeder's private key
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-3 border-t border-white/5">
+                    <div
+                      class="p-6 border-r border-white/5 text-xs font-bold text-white/60 self-center"
+                    >
+                      What a subpoena or insider can extract
+                    </div>
+                    <div
+                      class="p-6 border-r border-white/5 text-xs text-white/40 leading-relaxed"
+                    >
+                      <i class="fa-solid fa-minus text-white/15 mr-2"></i>The
+                      plaintext fingerprint database itself
+                    </div>
+                    <div class="p-6 text-xs text-white/70 leading-relaxed">
+                      <i class="fa-solid fa-check accent-text mr-2"></i>An
+                      encrypted blob and a proof — there's no readable genetic
+                      data to hand over
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-3 border-t border-white/5">
+                    <div
+                      class="p-6 border-r border-white/5 text-xs font-bold text-white/60 self-center"
+                    >
+                      Regulatory disclosure
+                    </div>
+                    <div
+                      class="p-6 border-r border-white/5 text-xs text-white/40 leading-relaxed"
+                    >
+                      <i class="fa-solid fa-minus text-white/15 mr-2"></i
+                      >All-or-nothing — the full record must be exposed to prove
+                      any single fact
+                    </div>
+                    <div class="p-6 text-xs text-white/70 leading-relaxed">
+                      <i class="fa-solid fa-check accent-text mr-2"></i
+                      >Selective — a zero-knowledge proof discloses only the
+                      facts required, seals the rest
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-3 border-t border-white/5">
+                    <div
+                      class="p-6 border-r border-white/5 text-xs font-bold text-white/60 self-center"
+                    >
+                      Audit trail integrity
+                    </div>
+                    <div
+                      class="p-6 border-r border-white/5 text-xs text-white/40 leading-relaxed"
+                    >
+                      <i class="fa-solid fa-minus text-white/15 mr-2"></i
+                      >Centralized logs — alterable by whoever operates the
+                      database
+                    </div>
+                    <div class="p-6 text-xs text-white/70 leading-relaxed">
+                      <i class="fa-solid fa-check accent-text mr-2"></i
+                      >Immutable on-chain commitment — any alteration breaks the
+                      cryptographic match
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="mt-8 p-6 bg-white/[0.02] border border-white/10 rounded-2xl flex gap-4 items-start"
+              >
+                <i class="fa-solid fa-circle-info text-white/30 mt-1"></i>
+                <p class="text-white/40 text-xs leading-relaxed">
+                  <span class="text-white/60 font-semibold"
+                    >Honest caveat:</span
+                  >
+                  comparing two breeders' samples without either side revealing
+                  raw data — cross-registry matching with no central plaintext
+                  copy — is still an open research problem (secure multi-party
+                  computation). It's on Veilcore's roadmap, not solved
+                  industry-wide today.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer
+        class="py-12 px-10 border-t border-white/5 flex justify-between items-center text-[9px] font-bold text-white/20 uppercase tracking-[0.4em]"
+      >
+        <div>© 2026 Veilcore Protocol • Midnight Build Club</div>
+        <div class="flex gap-12">
+          <a href="#" class="hover:text-white transition-colors"
+            >Protocol Specs</a
+          >
+          <a href="#" class="hover:text-white transition-colors"
+            >Privacy Audit</a
+          >
+          <a href="#" class="hover:text-white transition-colors">Explorer</a>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Intake Contract Modal -->
+    <div
+      id="contractModal"
+      class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6"
+    >
+      <div
+        onclick="closeContractModal()"
+        class="absolute inset-0 bg-black/80 backdrop-blur-sm"
+      ></div>
+      <div
+        class="relative w-full max-w-2xl glass-card rounded-[40px] p-12 max-h-[85vh] overflow-y-auto fade-up"
+      >
+        <div class="flex items-start justify-between gap-6 mb-8">
+          <div>
+            <div
+              class="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-2"
+            >
+              Pre-Sequencing Custody Agreement
+            </div>
+            <h2 class="title-font text-2xl font-bold">
+              Sample Intake & Chain-of-Custody Contract
+            </h2>
+          </div>
+          <button
+            onclick="closeContractModal()"
+            class="w-10 h-10 shrink-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div
+          class="grid grid-cols-2 gap-6 mb-8 p-6 bg-white/[0.02] border border-white/10 rounded-[24px]"
+        >
+          <div>
+            <div
+              class="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1"
+            >
+              Submitted By
+            </div>
+            <div class="font-mono text-sm" id="modalSubmitterName">—</div>
+          </div>
+          <div>
+            <div
+              class="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1"
+            >
+              Role
+            </div>
+            <div class="font-mono text-sm" id="modalSubmitterRole">—</div>
+          </div>
+          <div>
+            <div
+              class="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1"
+            >
+              Strain / Sample Name
+            </div>
+            <div class="font-mono text-sm accent-text" id="modalStrainName">
+              —
+            </div>
+          </div>
+          <div>
+            <div
+              class="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1"
+            >
+              Certificate Email
+            </div>
+            <div class="font-mono text-sm" id="modalEmail">—</div>
+          </div>
+          <div
+            id="modalSignedFields"
+            class="hidden col-span-2 grid grid-cols-3 gap-6 pt-6 mt-2 border-t border-white/5"
+          >
+            <div>
+              <div
+                class="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1"
+              >
+                Contract ID
+              </div>
+              <div class="font-mono text-sm accent-text" id="modalContractId">
+                —
+              </div>
+            </div>
+            <div>
+              <div
+                class="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1"
+              >
+                Sample ID
+              </div>
+              <div class="font-mono text-sm accent-text" id="modalSampleId">
+                —
+              </div>
+            </div>
+            <div>
+              <div
+                class="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1"
+              >
+                Signed At
+              </div>
+              <div class="font-mono text-sm" id="modalTimestamp">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="text-white/50 text-sm leading-relaxed space-y-4 mb-10 max-h-56 overflow-y-auto pr-2 border-y border-white/5 py-8"
+        >
+          <p>
+            <strong class="text-white/80">1. Custody Transfer.</strong> The
+            undersigned confirms physical delivery of the sample identified
+            above to Veilcore-authorized intake personnel. Custody of the
+            physical material transfers upon signature below.
+          </p>
+          <p>
+            <strong class="text-white/80">2. Zero-Knowledge Commitment.</strong>
+            No raw genetic data is transmitted, uploaded, or stored off-device
+            at any point in this process. Only a cryptographic commitment
+            derived from the sequenced file will later be anchored to the
+            Midnight Network.
+          </p>
+          <p>
+            <strong class="text-white/80">3. Immutable Timestamp.</strong>
+            Signing this contract generates a unique Contract ID and timestamp
+            permanently bound to this intake record. This timestamp cannot be
+            altered, backdated, or reissued.
+          </p>
+          <p>
+            <strong class="text-white/80">4. Sequencing Window.</strong> Digital
+            sequencing (Step 2) may occur at a later date. The original intake
+            timestamp remains the record of custody regardless of sequencing
+            delay.
+          </p>
+          <p>
+            <strong class="text-white/80">5. Verification Rights.</strong> The
+            resulting commitment hash may be independently verified on the
+            public Midnight ledger by any third party without exposing the
+            underlying genetic data.
+          </p>
+        </div>
+
+        <div class="flex items-center justify-between gap-6 flex-wrap">
+          <div
+            id="modalPendingNote"
+            class="text-[10px] font-bold text-white/30 uppercase tracking-widest max-w-xs"
+          >
+            Contract ID and timestamp are generated at the moment of signature.
+          </div>
+          <div
+            id="modalSignedNote"
+            class="hidden text-[10px] font-bold uppercase tracking-widest max-w-xs accent-text"
+          >
+            <i class="fa-solid fa-circle-check mr-2"></i>Signed and permanently
+            timestamped.
+          </div>
+          <div id="modalPendingActions" class="flex gap-3">
+            <button
+              onclick="closeContractModal()"
+              class="bg-white/5 border border-white/10 text-white/70 px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition-all"
+            >
+              Decline
+            </button>
+            <button
+              onclick="confirmSignContract()"
+              class="bg-white text-black px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-white/80 transition-all active:scale-95"
+            >
+              <i class="fa-solid fa-signature mr-2"></i>Sign & Timestamp
+            </button>
+          </div>
+          <div id="modalSignedActions" class="hidden flex gap-3">
+            <button
+              onclick="closeContractModal()"
+              class="bg-white/5 border border-white/10 text-white/70 px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition-all"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let role = 0;
+      let tab = 1;
+      let currentContractId = '—';
+      let currentEmail = '';
+      let currentHash = '';
+      let currentNonce = '';
+      let currentClaims = [];
+      let currentProof = '';
+      let claimsLocked = false;
+      let anchoredCount = 0;
+      const baseAnchoredCommitments = 1248;
+      const roleTabs = [1, 2, 3]; // Lab -> Intake, Breeder -> Certificates, Verifier -> Verifier
+      let signedContracts = []; // { contractId, sampleId, strain, stamp, submitter, submitterRole, email, hash, nonce, block, anchoredAt }
+      let tamperedHash = ''; // last hash produced by the "Simulate tampering" demo button
+      let tamperOriginalHash = '';
+      const themes = ['theme-lab', 'theme-breeder', 'theme-verifier'];
+      const roleLabels = ['Lab Manager', 'Breeder/Owner', 'Verifier'];
+
+      const roleContent = [
+        {
+          headline: 'Genetic Data Intake',
+          subtitle: 'Chain-of-custody starts at the physical sample — before sequencing ever begins. <span class="accent-text font-semibold">Privacy is mathematically guaranteed.</span>',
+          privacy: 'Veilcore Protocol: Zero-Knowledge Data Sovereignty'
+        },
+        {
+          headline: 'Your Genetic Assets',
+          subtitle: 'Track every sample you\u2019ve submitted from intake through certified, on-chain proof. <span class="accent-text font-semibold">Your raw genetic data never leaves your device.</span>',
+          privacy: 'Veilcore Protocol: You Own Your Data, Always'
+        },
+        {
+          headline: 'Public Provenance Verification',
+          subtitle: 'Independently confirm a sample\u2019s chain of custody without ever seeing the underlying genetic data. <span class="accent-text font-semibold">Verification is public. The data is not.</span>',
+          privacy: 'Veilcore Protocol: Verifiable, Never Exposed'
+        }
+      ];
+
+      function setRole(r) {
+        role = r;
+        document.body.className = themes[r];
+        document.querySelectorAll('.role-btn').forEach((b, i) => b.classList.toggle('active', i === r));
+
+        const c = roleContent[r];
+        const headline = document.getElementById('intakeHeadline');
+        const subtitle = document.getElementById('intakeSubtitle');
+        const privacy = document.getElementById('privacyLine');
+        if (headline) headline.textContent = c.headline;
+        if (subtitle) subtitle.innerHTML = c.subtitle;
+        if (privacy) privacy.innerHTML = c.privacy;
+
+        switchTab(roleTabs[r]);
+
+        // Smooth transition message
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-12 right-12 glass p-6 rounded-[24px] border-white/10 text-[10px] font-bold uppercase tracking-widest fade-up z-[100]';
+        toast.innerHTML = `<span class="accent-text">●</span> Access Shifted: ${roleLabels[r]}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+      }
+
+      function switchTab(n) {
+        document.querySelectorAll('[id^="panel"]').forEach(p => p.classList.add('hidden'));
+        document.getElementById('panel' + n).classList.remove('hidden');
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', Number(t.dataset.tab) === n));
+        tab = n;
+      }
+
+      function openContractModal() {
+        const nameInput = document.getElementById('submitterName');
+        const name = nameInput ? nameInput.value.trim() : '';
+
+        if (!name) {
+          nameInput.classList.add('border-red-500/60');
+          nameInput.focus();
+          const toast = document.createElement('div');
+          toast.className = 'fixed bottom-12 right-12 glass p-6 rounded-[24px] border-white/10 text-[10px] font-bold uppercase tracking-widest fade-up z-[100]';
+          toast.innerHTML = `<span class="text-red-400">●</span> Enter who's submitting the sample before reviewing the contract`;
+          document.body.appendChild(toast);
+          setTimeout(() => toast.remove(), 2500);
+          return;
+        }
+        nameInput.classList.remove('border-red-500/60');
+
+        const roleSelect = document.getElementById('submitterRole');
+        const strainInput = document.getElementById('strainName');
+        const strain = (strainInput && strainInput.value.trim()) || 'Unnamed Strain';
+        const emailInput = document.getElementById('submitterEmail');
+        const email = (emailInput && emailInput.value.trim()) || 'Not provided';
+
+        document.getElementById('modalSubmitterName').textContent = name;
+        document.getElementById('modalSubmitterRole').textContent = roleSelect ? roleSelect.value : '—';
+        document.getElementById('modalStrainName').textContent = strain;
+        document.getElementById('modalEmail').textContent = email;
+
+        document.getElementById('modalSignedFields').classList.add('hidden');
+        document.getElementById('modalPendingNote').classList.remove('hidden');
+        document.getElementById('modalSignedNote').classList.add('hidden');
+        document.getElementById('modalPendingActions').classList.remove('hidden');
+        document.getElementById('modalSignedActions').classList.add('hidden');
+
+        document.getElementById('contractModal').classList.remove('hidden');
+      }
+
+      function closeContractModal() {
+        document.getElementById('contractModal').classList.add('hidden');
+      }
+
+      function viewSignedContract() {
+        const c = signedContracts.find(sc => sc.contractId === currentContractId);
+        if (!c) return;
+
+        document.getElementById('modalSubmitterName').textContent = c.submitter;
+        document.getElementById('modalSubmitterRole').textContent = c.submitterRole;
+        document.getElementById('modalStrainName').textContent = c.strain;
+        document.getElementById('modalEmail').textContent = c.email || 'Not provided';
+        document.getElementById('modalContractId').textContent = c.contractId;
+        document.getElementById('modalSampleId').textContent = c.sampleId;
+        document.getElementById('modalTimestamp').textContent = c.stamp;
+
+        document.getElementById('modalSignedFields').classList.remove('hidden');
+        document.getElementById('modalPendingNote').classList.add('hidden');
+        document.getElementById('modalSignedNote').classList.remove('hidden');
+        document.getElementById('modalPendingActions').classList.add('hidden');
+        document.getElementById('modalSignedActions').classList.remove('hidden');
+
+        document.getElementById('contractModal').classList.remove('hidden');
+      }
+
+      function confirmSignContract() {
+        const sampleId = 'VC-' + String(Math.floor(100000 + Math.random() * 900000));
+        const now = new Date();
+        const stamp = now.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+        const contractId = 'C-' + now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0') + '-' + String(Math.floor(Math.random() * 900) + 100);
+        const strainInput = document.getElementById('strainName');
+        const strain = (strainInput && strainInput.value.trim()) || 'Unnamed Strain';
+        const nameInput = document.getElementById('submitterName');
+        const submitter = (nameInput && nameInput.value.trim()) || 'Unnamed Submitter';
+        const roleSelect = document.getElementById('submitterRole');
+        const submitterRole = roleSelect ? roleSelect.value : '—';
+        const emailInput = document.getElementById('submitterEmail');
+        const email = (emailInput && emailInput.value.trim()) || '';
+        currentContractId = contractId;
+        currentEmail = email;
+
+        signedContracts.push({ contractId, sampleId, strain, stamp, submitter, submitterRole, email });
+
+        closeContractModal();
+
+        // Lock Step 1 as complete
+        const btn = document.getElementById('step1Btn');
+        btn.disabled = true;
+        btn.classList.add('opacity-40', 'cursor-not-allowed');
+        btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Contract Signed';
+        document.getElementById('step1Status').innerHTML =
+          `Contract <span class="accent-text font-mono">${contractId}</span> signed by <span class="accent-text">${submitter}</span> for sample <span class="accent-text font-mono">${sampleId}</span>, timestamped <span class="accent-text font-mono">${stamp}</span> — pre-sequencing record locked.`;
+
+        // Swap the intake fields for the readable contract metadata panel
+        document.getElementById('strainInputWrap').classList.add('hidden');
+        document.getElementById('mdContractId').textContent = contractId;
+        document.getElementById('mdSampleId').textContent = sampleId;
+        document.getElementById('mdStrain').textContent = strain;
+        document.getElementById('mdSubmitter').textContent = submitter;
+        document.getElementById('mdRole').textContent = submitterRole;
+        document.getElementById('mdTimestamp').textContent = stamp;
+        document.getElementById('contractView').classList.remove('hidden');
+        document.getElementById('viewContractBtn').classList.remove('hidden');
+
+        // Unlock Step 2 and pass the pairing info through
+        const step2 = document.getElementById('step2Card');
+        step2.classList.remove('opacity-30', 'pointer-events-none');
+        document.getElementById('pairedSampleId').textContent = sampleId;
+        document.getElementById('pairedTimestamp').textContent = stamp;
+
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-12 right-12 glass p-6 rounded-[24px] border-white/10 text-[10px] font-bold uppercase tracking-widest fade-up z-[100]';
+        toast.innerHTML = `<span class="accent-text">●</span> Contract ${contractId} Signed & Timestamped`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+      }
+
+      function togglePreviousTimestamps() {
+        const wrap = document.getElementById('previousTimestamps');
+        const isHidden = wrap.classList.contains('hidden');
+
+        if (isHidden && signedContracts.length === 0) {
+          const toast = document.createElement('div');
+          toast.className = 'fixed bottom-12 right-12 glass p-6 rounded-[24px] border-white/10 text-[10px] font-bold uppercase tracking-widest fade-up z-[100]';
+          toast.innerHTML = `<span class="accent-text">●</span> No signed contracts yet — complete Step 1 first`;
+          document.body.appendChild(toast);
+          setTimeout(() => toast.remove(), 2500);
+          return;
+        }
+
+        if (isHidden) {
+          wrap.innerHTML = signedContracts.slice().reverse().map((c, revIdx) => {
+            const idx = signedContracts.length - 1 - revIdx;
+            return `<div onclick="selectPreviousTimestamp(${idx})" class="p-6 flex items-center justify-between gap-6 hover:bg-white/[0.04] cursor-pointer transition-all">
+              <div>
+                <div class="font-bold text-sm mb-1">${c.strain}</div>
+                <div class="text-white/30 text-xs font-mono">${c.contractId} • ${c.sampleId}</div>
+              </div>
+              <div class="text-white/40 text-xs font-mono whitespace-nowrap">${c.stamp}</div>
+            </div>`;
+          }).join('');
+        }
+
+        wrap.classList.toggle('hidden');
+      }
+
+      function selectPreviousTimestamp(idx) {
+        const c = signedContracts[idx];
+        if (!c) return;
+        currentContractId = c.contractId;
+
+        document.getElementById('pairedSampleId').textContent = c.sampleId;
+        document.getElementById('pairedTimestamp').textContent = c.stamp;
+        document.getElementById('previousTimestamps').classList.add('hidden');
+
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-12 right-12 glass p-6 rounded-[24px] border-white/10 text-[10px] font-bold uppercase tracking-widest fade-up z-[100]';
+        toast.innerHTML = `<span class="accent-text">●</span> Paired to ${c.strain} (${c.contractId})`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+      }
+
+      function showFileIntake(name, sizeLabel) {
+        document.getElementById('dropzone').classList.add('hidden');
+        document.getElementById('activeIntake').classList.remove('hidden');
+        document.getElementById('fileName').textContent = name;
+        document.getElementById('fileSize').textContent = sizeLabel;
+      }
+
+      function handleFile(input) {
+        if (input.files && input.files[0]) {
+          const f = input.files[0];
+          showFileIntake(f.name, (f.size / 1024).toFixed(1) + ' KB • Readiness Confirmed');
+        }
+      }
+
+      // Demo-safe stand-in for a real sequencer upload — no file ever leaves (or touches) the presenter's device.
+      const SIMULATED_SEQUENCE_FILES = [
+        'Genetic_Sequence_Alpha.fasta',
+        'BlueDream14_Readout.fasta',
+        'Sample_Chemotype_Panel.vcf',
+        'Lab_Sequencer_Export_009.fasta',
+        'Strain_Marker_Profile.vcf'
+      ];
+
+      function simulateFileIntake() {
+        const name = SIMULATED_SEQUENCE_FILES[Math.floor(Math.random() * SIMULATED_SEQUENCE_FILES.length)];
+        const sizeMb = (1.8 + Math.random() * 2.4).toFixed(1);
+        showFileIntake(name, sizeMb + ' MB • Simulated Sequencer Read');
+      }
+
+      // Real SHA-256 hash commitment: H(strain | submitter | role | contract | sample |
+      // timestamp | file name | random nonce) — computed locally via the browser's native
+      // crypto.subtle API, not simulated. Change any field and the hash changes; the same
+      // inputs plus the same nonce always reproduce the exact same hash.
+      async function computeRealHash() {
+        const btn = document.getElementById('hashBtn');
+        const scanner = document.getElementById('activeScanner');
+        const display = document.getElementById('hashDisplay');
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner-third fa-spin mr-2"></i> Processing...';
+        scanner.style.display = 'block';
+
+        const nonce = '0x' + Array.from(crypto.getRandomValues(new Uint8Array(8))).map(b => b.toString(16).padStart(2,'0')).join('');
+        const fileNameEl = document.getElementById('fileName');
+        const payload = [
+          document.getElementById('mdStrain')?.textContent || '',
+          document.getElementById('mdSubmitter')?.textContent || '',
+          document.getElementById('mdRole')?.textContent || '',
+          currentContractId,
+          document.getElementById('mdSampleId')?.textContent || '',
+          document.getElementById('mdTimestamp')?.textContent || '',
+          fileNameEl ? fileNameEl.textContent : '',
+          nonce
+        ].join('|');
+        const digestBuf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(payload));
+        const h = '0x' + Array.from(new Uint8Array(digestBuf)).map(b => b.toString(16).padStart(2,'0')).join('');
+
+        setTimeout(() => {
+          currentHash = h;
+          currentNonce = nonce;
+          display.innerHTML = `<div class="font-bold accent-text mb-2 uppercase tracking-[0.2em] text-[10px]"><i class="fa-solid fa-circle-check mr-1.5"></i>Real SHA-256 Commitment — Computed Locally</div>${h}<div class="text-white/30 text-[10px] mt-3 tracking-widest uppercase">Nonce: <span class="text-white/50">${nonce}</span></div>`;
+          display.classList.remove('hidden');
+          scanner.style.display = 'none';
+
+          document.getElementById('s-2').classList.add('active');
+          document.getElementById('l-1').classList.add('active');
+
+          btn.textContent = 'Integrity Verified';
+          btn.className = 'bg-white/[0.05] border border-white/10 text-white px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest';
+
+          currentClaims = buildClaims();
+          renderClaims();
+
+          setTimeout(() => {
+            document.getElementById('custodyCard').classList.remove('hidden');
+          }, 500);
+
+          setTimeout(() => {
+            document.getElementById('disclosureCard').classList.remove('hidden');
+          }, 1300);
+        }, 2000);
+      }
+
+      // Simulated facts a sequencer could extract from the raw DNA read.
+      // Sensitive ones default to Private; the genome itself can never be toggled public.
+      function buildClaims() {
+        const thc = (18 + Math.random() * 9).toFixed(1);
+        const lineageMatch = (96 + Math.random() * 3.8).toFixed(1);
+        return [
+          { id: 'species', label: 'Species / Genus', value: 'Cannabis sativa L. — confirmed', public: true, lockable: true, rationale: 'Recommended public — no IP exposure' },
+          { id: 'chemotype', label: 'Chemotype Classification', value: `THC-Dominant (Type I) · ${thc}% total THC`, public: true, lockable: true, rationale: 'Recommended public — regulators expect this' },
+          { id: 'compliance', label: 'Regulatory Compliance', value: 'Δ9-THC dry-weight threshold check', public: true, lockable: true, rationale: 'Recommended public — proves compliance without dispute' },
+          { id: 'lineage', label: 'Parent Lineage Match', value: `${lineageMatch}% marker concordance to registered parent line`, public: false, lockable: true, rationale: 'Recommended private — protects proprietary breeding IP' },
+          { id: 'genome', label: 'Full Genomic Sequence', value: 'Raw base-pair data — never leaves this device', public: false, lockable: false, rationale: 'Never disclosable — the core privacy guarantee' }
+        ];
+      }
+
+      function renderClaims() {
+        const wrap = document.getElementById('claimsList');
+        if (!wrap) return;
+        wrap.innerHTML = currentClaims.map(c => `
+          <div class="flex items-center justify-between gap-6 p-5 bg-black/40 rounded-2xl border border-white/5">
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-white/80 mb-1">${c.label}</div>
+              <div class="text-white/40 text-[11px] font-mono truncate mb-1">${c.value}</div>
+              <div class="text-white/20 text-[9px] uppercase tracking-widest">${c.rationale}</div>
+            </div>
+            ${c.lockable
+              ? `<button onclick="toggleClaim('${c.id}')" ${claimsLocked ? 'disabled' : ''} class="shrink-0 w-32 py-2.5 rounded-full text-[9px] font-bold uppercase tracking-widest transition-all ${claimsLocked ? 'opacity-40 cursor-not-allowed ' : ''}${c.public ? 'bg-white text-black' : 'bg-white/5 text-white/40 border border-white/10'}">${c.public ? '<i class="fa-solid fa-eye mr-1.5"></i>Public' : '<i class="fa-solid fa-lock mr-1.5"></i>Private'}</button>`
+              : `<div class="shrink-0 w-32 py-2.5 rounded-full text-[9px] font-bold uppercase tracking-widest text-center bg-black border border-white/10 text-white/25"><i class="fa-solid fa-lock mr-1.5"></i>Sealed</div>`
+            }
+          </div>
+        `).join('');
+      }
+
+      function toggleClaim(id) {
+        const claim = currentClaims.find(c => c.id === id);
+        if (claim) claim.public = !claim.public;
+        renderClaims();
+      }
+
+      function onConsentChange() {
+        const checked = document.getElementById('disclosureConsent').checked;
+        const btn = document.getElementById('zkProofBtn');
+        btn.disabled = !checked;
+        btn.className = checked
+          ? 'w-full py-6 bg-white/5 border border-white/10 text-white font-bold rounded-2xl text-xs uppercase tracking-widest hover:bg-white/10 transition-all active:scale-[0.98]'
+          : 'w-full py-6 bg-white/5 border border-white/10 text-white/30 font-bold rounded-2xl text-xs uppercase tracking-widest transition-all active:scale-[0.98] cursor-not-allowed';
+      }
+
+      function reviseDisclosure() {
+        currentProof = '';
+        document.getElementById('zkProofOutput').classList.add('hidden');
+        claimsLocked = false;
+        renderClaims();
+        document.getElementById('zkProofBtn').innerHTML = 'Generate Zero-Knowledge Proof';
+        const consent = document.getElementById('disclosureConsent');
+        consent.checked = false;
+        onConsentChange();
+        document.getElementById('s-3').classList.remove('active');
+        document.getElementById('l-2').classList.remove('active');
+        document.getElementById('anchorBtn').classList.add('hidden');
+      }
+
+      function generateZkProof() {
+        const btn = document.getElementById('zkProofBtn');
+        const stages = ['Compiling arithmetic circuit...', 'Generating private witness...', 'Producing zk-SNARK proof π...'];
+        let i = 0;
+        btn.disabled = true;
+
+        const step = () => {
+          btn.innerHTML = `<i class="fa-solid fa-spinner-third fa-spin mr-2"></i> ${stages[i]}`;
+          i++;
+          if (i < stages.length) {
+            setTimeout(step, 550);
+            return;
+          }
+          setTimeout(() => {
+            currentProof = '0x' + Array.from(crypto.getRandomValues(new Uint8Array(48))).map(b => b.toString(16).padStart(2,'0')).join('');
+            const disclosed = currentClaims.filter(c => c.public);
+            const sealed = currentClaims.filter(c => !c.public);
+
+            document.getElementById('zkProofHash').textContent = currentProof;
+            document.getElementById('zkProofStatement').innerHTML =
+              `This proof verifies the sequence hashed above cryptographically binds to <span class="accent-text">Contract ${currentContractId}</span>, signed <span class="accent-text">${document.getElementById('mdTimestamp').textContent}</span> — without revealing the sequence itself. <span class="text-white/50 font-semibold">${disclosed.length} fact${disclosed.length === 1 ? '' : 's'} disclosed publicly, ${sealed.length} proven and sealed.</span>`;
+            document.getElementById('zkProofOutput').classList.remove('hidden');
+
+            btn.textContent = 'Proof Generated';
+            btn.className = 'w-full py-6 bg-white/[0.05] border border-white/10 text-white font-bold rounded-2xl text-xs uppercase tracking-widest';
+
+            document.getElementById('s-3').classList.add('active');
+            document.getElementById('l-2').classList.add('active');
+            document.getElementById('anchorBtn').classList.remove('hidden');
+
+            claimsLocked = true;
+            renderClaims();
+          }, 600);
+        };
+        step();
+      }
+
+      // Renders only the toggled-public facts, plus a count of what stays sealed —
+      // shared by the Certificate panel and the public Verifier so both show identical disclosure.
+      function renderDisclosedClaims(claims, listId, noteId) {
+        const wrap = document.getElementById(listId);
+        const note = document.getElementById(noteId);
+        if (!wrap || !note) return;
+        if (!claims || !claims.length) {
+          wrap.innerHTML = '';
+          note.innerHTML = '';
+          return;
+        }
+        const disclosed = claims.filter(c => c.public);
+        const sealed = claims.filter(c => !c.public);
+        wrap.innerHTML = disclosed.map(c => `
+          <div class="flex items-start gap-3 text-xs">
+            <i class="fa-solid fa-circle-check accent-text mt-0.5"></i>
+            <div><span class="font-bold text-white/70">${c.label}:</span> <span class="text-white/50">${c.value}</span></div>
+          </div>
+        `).join('');
+        note.innerHTML = sealed.length
+          ? `<i class="fa-solid fa-lock mr-2"></i>${sealed.length} additional fact${sealed.length === 1 ? '' : 's'} cryptographically proven, kept sealed`
+          : '';
+      }
+
+      function completeFlow() {
+        const btn = document.getElementById('anchorBtn');
+        btn.innerHTML = '<i class="fa-solid fa-link fa-spin mr-4"></i> Anchoring to Midnight ZK-Ledger...';
+
+        setTimeout(() => {
+          document.getElementById('s-4').classList.add('active');
+          document.getElementById('l-3').classList.add('active');
+          btn.textContent = 'Commitment Permanently Anchored';
+          btn.className = 'w-full py-8 bg-white text-black font-bold rounded-[32px] text-xl cursor-default';
+          // Locked for good — no further clicks can re-trigger anchoring or advance stats
+          btn.disabled = true;
+          btn.onclick = null;
+
+          // Disclosure is now permanently locked on-chain — no more revising this record
+          document.getElementById('reviseBtn').classList.add('hidden');
+          const consentWrap = document.getElementById('consentWrap');
+          consentWrap.innerHTML = '<span class="text-[11px] text-white/40 leading-relaxed"><i class="fa-solid fa-lock mr-2 accent-text"></i>Disclosure choices are now permanently anchored and cannot be changed.</span>';
+
+          // Record the anchor on the matching contract so the Verifier can look it up later
+          const contract = signedContracts.find(sc => sc.contractId === currentContractId);
+          if (contract) {
+            contract.hash = currentHash;
+            contract.nonce = currentNonce;
+            contract.claims = currentClaims;
+            contract.proof = currentProof;
+            contract.block = Math.floor(880000 + Math.random() * 20000);
+            contract.anchoredAt = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+          }
+          anchoredCount++;
+          updateStats();
+
+          setTimeout(() => {
+            switchTab(2);
+            document.getElementById('certHash').textContent = currentHash;
+            document.getElementById('certContractId').textContent = currentContractId;
+            renderDisclosedClaims(contract ? contract.claims : currentClaims, 'certClaims', 'certSealedNote');
+            document.getElementById('certIssued').textContent = 'Issued ' + new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            document.getElementById('certAssetId').textContent = 'VEIL-DNA-' + currentContractId.replace(/[^0-9]/g, '').slice(-6) + '-X';
+
+            const emailNote = document.getElementById('certEmailNote');
+            if (currentEmail) {
+              document.getElementById('certEmailAddr').textContent = currentEmail;
+              emailNote.classList.remove('hidden');
+
+              setTimeout(() => {
+                const toast = document.createElement('div');
+                toast.className = 'fixed bottom-12 right-12 glass p-6 rounded-[24px] border-white/10 text-[10px] font-bold uppercase tracking-widest fade-up z-[100]';
+                toast.innerHTML = `<i class="fa-solid fa-paper-plane accent-text mr-2"></i> Certificate delivered to ${currentEmail}`;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+              }, 700);
+            } else {
+              emailNote.classList.add('hidden');
+            }
+          }, 1000);
+        }, 2200);
+      }
+
+      function runVerifyAnim() {
+        const input = document.getElementById('verifyInput');
+        const query = input.value.trim();
+        const success = document.getElementById('vSuccess');
+        const fail = document.getElementById('vFail');
+        const tamper = document.getElementById('vTamper');
+        success.classList.add('hidden');
+        fail.classList.add('hidden');
+        tamper.classList.add('hidden');
+
+        if (!query) {
+          input.focus();
+          input.classList.add('border-red-500/60');
+          setTimeout(() => input.classList.remove('border-red-500/60'), 1200);
+          return;
+        }
+
+        if (tamperedHash && query.toLowerCase() === tamperedHash.toLowerCase()) {
+          tamper.classList.remove('hidden');
+          tamper.classList.add('fade-up');
+          return;
+        }
+
+        const match = signedContracts.find(c => c.hash && c.hash.toLowerCase() === query.toLowerCase());
+
+        if (match) {
+          document.getElementById('vSuccessSub').textContent =
+            `${match.strain} • Contract ${match.contractId} • Block #${match.block.toLocaleString()}`;
+          renderDisclosedClaims(match.claims, 'vClaims', 'vSealedNote');
+          success.classList.remove('hidden');
+          success.classList.add('fade-up');
+        } else {
+          fail.classList.remove('hidden');
+          fail.classList.add('fade-up');
+        }
+      }
+
+      function autofillVerifier() {
+        const anchored = signedContracts.slice().reverse().find(c => c.hash);
+        const input = document.getElementById('verifyInput');
+        if (!anchored) {
+          const toast = document.createElement('div');
+          toast.className = 'fixed bottom-12 right-12 glass p-6 rounded-[24px] border-white/10 text-[10px] font-bold uppercase tracking-widest fade-up z-[100]';
+          toast.innerHTML = `<span class="accent-text">●</span> No anchored commitments yet — run an intake first`;
+          document.body.appendChild(toast);
+          setTimeout(() => toast.remove(), 2500);
+          return;
+        }
+        tamperedHash = '';
+        input.value = anchored.hash;
+        input.focus();
+      }
+
+      // Flips one hex character of a real anchored hash so presenters can show, live,
+      // that even a single-bit change makes the cryptographic match fail completely.
+      function simulateTamper() {
+        const anchored = signedContracts.slice().reverse().find(c => c.hash);
+        const input = document.getElementById('verifyInput');
+        if (!anchored) {
+          const toast = document.createElement('div');
+          toast.className = 'fixed bottom-12 right-12 glass p-6 rounded-[24px] border-white/10 text-[10px] font-bold uppercase tracking-widest fade-up z-[100]';
+          toast.innerHTML = `<span class="accent-text">●</span> No anchored commitments yet — run an intake first`;
+          document.body.appendChild(toast);
+          setTimeout(() => toast.remove(), 2500);
+          return;
+        }
+
+        const original = anchored.hash;
+        const pos = 2 + Math.floor(Math.random() * (original.length - 2));
+        const chars = '0123456789abcdef';
+        let newChar;
+        do { newChar = chars[Math.floor(Math.random() * chars.length)]; } while (newChar === original[pos].toLowerCase());
+        tamperedHash = original.slice(0, pos) + newChar + original.slice(pos + 1);
+        tamperOriginalHash = original;
+
+        input.value = tamperedHash;
+        input.focus();
+
+        document.getElementById('vSuccess').classList.add('hidden');
+        document.getElementById('vFail').classList.add('hidden');
+        document.getElementById('vTamper').classList.add('hidden');
+        document.getElementById('tamperOriginalDisplay').innerHTML = highlightDiff(original, pos);
+        document.getElementById('tamperSubmittedDisplay').innerHTML = highlightDiff(tamperedHash, pos);
+      }
+
+      function highlightDiff(str, pos) {
+        return str.slice(0, pos) + '<span class="bg-red-500/30 text-red-200 font-bold px-0.5 rounded">' + str[pos] + '</span>' + str.slice(pos + 1);
+      }
+
+      function updateStats() {
+        const el = document.getElementById('statAnchored');
+        if (el) el.textContent = (baseAnchoredCommitments + anchoredCount).toLocaleString();
+      }
+
+      function resetDemo() {
+        signedContracts = [];
+        currentContractId = '—';
+        currentEmail = '';
+        claimsLocked = false;
+        currentHash = '';
+        currentNonce = '';
+        currentClaims = [];
+        currentProof = '';
+        anchoredCount = 0;
+
+        // Step 1: Intake contract
+        const step1Btn = document.getElementById('step1Btn');
+        step1Btn.disabled = false;
+        step1Btn.classList.remove('opacity-40', 'cursor-not-allowed');
+        step1Btn.innerHTML = 'Sign Intake Contract';
+        document.getElementById('step1Status').textContent = "Record who's dropping off the sample, then review and sign the custody agreement before it's timestamped.";
+        document.getElementById('strainInputWrap').classList.remove('hidden');
+        document.getElementById('contractView').classList.add('hidden');
+        document.getElementById('viewContractBtn').classList.add('hidden');
+        ['submitterName', 'strainName', 'submitterEmail'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = '';
+        });
+        const roleSelect = document.getElementById('submitterRole');
+        if (roleSelect) roleSelect.selectedIndex = 0;
+
+        // Step 2: DNA pairing
+        document.getElementById('step2Card').classList.add('opacity-30', 'pointer-events-none');
+        document.getElementById('pairedSampleId').textContent = '—';
+        document.getElementById('pairedTimestamp').textContent = '—';
+        document.getElementById('previousTimestamps').classList.add('hidden');
+        document.getElementById('dropzone').classList.remove('hidden');
+        document.getElementById('activeIntake').classList.add('hidden');
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput) fileInput.value = '';
+
+        const hashBtn = document.getElementById('hashBtn');
+        hashBtn.disabled = false;
+        hashBtn.innerHTML = 'Compute Local Hash';
+        hashBtn.className = 'bg-white text-black px-10 py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-white/80 transition-all active:scale-95';
+
+        ['s-1', 's-2', 's-3', 's-4'].forEach((id, i) => {
+          document.getElementById(id).classList.toggle('active', i === 0);
+        });
+        ['l-1', 'l-2', 'l-3'].forEach(id => document.getElementById(id).classList.remove('active'));
+
+        const hashDisplay = document.getElementById('hashDisplay');
+        hashDisplay.classList.add('hidden');
+        hashDisplay.innerHTML = '';
+        document.getElementById('activeScanner').style.display = 'none';
+        document.getElementById('custodyCard').classList.add('hidden');
+
+        const anchorBtn = document.getElementById('anchorBtn');
+        anchorBtn.innerHTML = 'Anchor Commitment to Midnight Ledger';
+        anchorBtn.className = 'hidden w-full py-8 bg-white text-black font-bold rounded-[32px] text-xl transition-all active:scale-[0.98] accent-glow tracking-tight';
+        anchorBtn.disabled = false;
+        anchorBtn.onclick = completeFlow;
+
+        // Selective Disclosure card
+        document.getElementById('disclosureCard').classList.add('hidden');
+        document.getElementById('claimsList').innerHTML = '';
+        const zkProofBtn = document.getElementById('zkProofBtn');
+        zkProofBtn.disabled = true;
+        zkProofBtn.innerHTML = 'Generate Zero-Knowledge Proof';
+        zkProofBtn.className = 'w-full py-6 bg-white/5 border border-white/10 text-white/30 font-bold rounded-2xl text-xs uppercase tracking-widest transition-all active:scale-[0.98] cursor-not-allowed';
+        document.getElementById('zkProofOutput').classList.add('hidden');
+        document.getElementById('zkProofHash').textContent = '—';
+        document.getElementById('zkProofStatement').innerHTML = '';
+        document.getElementById('reviseBtn').classList.remove('hidden');
+        document.getElementById('consentWrap').innerHTML = '<input type="checkbox" id="disclosureConsent" onchange="onConsentChange()" class="mt-0.5 w-4 h-4 shrink-0 accent-white"><span class="text-[11px] text-white/50 leading-relaxed">I confirm the facts marked <span class="text-white/70 font-semibold">Public</span> above are intended for permanent public disclosure. <span class="text-white/70 font-semibold">This choice cannot be changed once anchored to the ledger.</span></span>';
+
+        // Certificate panel
+        document.getElementById('certContractId').textContent = '—';
+        document.getElementById('certHash').textContent = 'Run an intake to generate a commitment';
+        document.getElementById('certIssued').textContent = 'Not yet issued';
+        document.getElementById('certAssetId').textContent = 'VEIL-DNA-PENDING-X';
+        document.getElementById('certEmailNote').classList.add('hidden');
+        document.getElementById('certClaims').innerHTML = '';
+        document.getElementById('certSealedNote').innerHTML = '';
+
+        // Verifier panel
+        const verifyInput = document.getElementById('verifyInput');
+        if (verifyInput) verifyInput.value = '';
+        document.getElementById('vSuccess').classList.add('hidden');
+        document.getElementById('vFail').classList.add('hidden');
+        document.getElementById('vTamper').classList.add('hidden');
+        document.getElementById('vClaims').innerHTML = '';
+        document.getElementById('vSealedNote').innerHTML = '';
+        tamperedHash = '';
+        tamperOriginalHash = '';
+
+        updateStats();
+        setRole(0);
+
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-12 right-12 glass p-6 rounded-[24px] border-white/10 text-[10px] font-bold uppercase tracking-widest fade-up z-[100]';
+        toast.innerHTML = '<span class="accent-text">●</span> Demo Reset — Ready for a Fresh Pitch';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+      }
+
+      function runFullDemo() {
+        setRole(0);
+        switchTab(1);
+
+        const strainInput = document.getElementById('strainName');
+        if (strainInput && !strainInput.value.trim()) strainInput.value = 'Blue Dream #14';
+        const nameInput = document.getElementById('submitterName');
+        if (nameInput && !nameInput.value.trim()) nameInput.value = 'Jordan Reyes';
+        const emailInput = document.getElementById('submitterEmail');
+        if (emailInput && !emailInput.value.trim()) emailInput.value = 'jordan@veilcore.io';
+        if (!document.getElementById('step1Btn').disabled) confirmSignContract();
+
+        setTimeout(() => {
+          showFileIntake('Genetic_Sequence_Alpha.fasta', '2.4 MB • Simulated Sequencer Read');
+          setTimeout(computeRealHash, 600);
+
+          // computeRealHash's own animation runs ~2000ms, then reveals the
+          // Selective Disclosure card at +1300ms — wait for both before continuing.
+          setTimeout(() => {
+            const consent = document.getElementById('disclosureConsent');
+            if (consent && !consent.checked) {
+              consent.checked = true;
+              onConsentChange();
+            }
+
+            setTimeout(() => {
+              const zkBtn = document.getElementById('zkProofBtn');
+              if (zkBtn && !zkBtn.disabled) generateZkProof();
+
+              // generateZkProof runs 3 staged messages (550ms each) + a final 600ms reveal.
+              setTimeout(() => {
+                const anchorBtn = document.getElementById('anchorBtn');
+                if (anchorBtn && !anchorBtn.disabled) completeFlow();
+              }, 2400);
+            }, 700);
+          }, 600 + 2000 + 1300 + 400);
+        }, 900);
+      }
+
+      // Keyboard Shortcuts (disabled while typing in a field)
+      document.addEventListener('keydown', e => {
+        const tag = (e.target.tagName || '').toLowerCase();
+        const isTyping = tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable;
+        if (isTyping) return;
+        if (e.key === '1') switchTab(0);
+        if (e.key === '2') switchTab(1);
+        if (e.key === '3') switchTab(2);
+        if (e.key === '4') switchTab(3);
+        if (e.key === '5') switchTab(4);
+        if (e.key === 'r') setRole((role + 1) % 3);
+      });
+
+      // Deep-link support for screenshots/sharing: ?tab=0..4 opens that panel directly
+      (function initTabFromUrl() {
+        const n = Number(new URLSearchParams(window.location.search).get('tab'));
+        if (!Number.isNaN(n) && n >= 0 && n <= 4) switchTab(n);
+      })();
+
+      updateStats();
+    </script>
+  </body>
+</html>
